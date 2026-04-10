@@ -1,0 +1,5 @@
+*.wav
+*.mid
+installers/
+__pycache__/
+*.pyc
