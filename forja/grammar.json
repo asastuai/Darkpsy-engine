@@ -215,6 +215,48 @@
     "bpm_tolerance": 3.0,
     "mono_below_corr_min": 0.9
   },
+  "arrangement": {
+    "_": "Mined from the 46k arrangement transcript (OYzU5VXekpM): 16-bar segments ending in a fill (15+1), energy staircase per drop, high-passed builds w/ snare roll, impacts at drop starts, binary-division one-shots with intentional skips, micro-silence as weapon.",
+    "segment_bars": 16,
+    "fill": {
+      "kickbass_out_frac": 0.5,
+      "drum_roll": true,
+      "riser_into_next": true,
+      "skip_prob": 0.25
+    },
+    "energy_staircase": {
+      "start_gain": 0.55,
+      "end_gain": 1.0,
+      "stems": [
+        "acid",
+        "lead",
+        "drums",
+        "fx",
+        "fm"
+      ]
+    },
+    "build": {
+      "hp_sweep_hz": [
+        30,
+        350
+      ],
+      "snare_roll_last_bars": 4
+    },
+    "impact": {
+      "at_drop_start": true,
+      "thump_hz": 55,
+      "level": 0.5
+    },
+    "oneshots": {
+      "division_levels": 3,
+      "skip_prob": 0.35,
+      "riser_level": 0.16,
+      "impact_level": 0.3
+    },
+    "micro_silence": {
+      "s16_before_drop": 1
+    }
+  },
   "reference_profiles": {
     "glosolalia_blueprints": {
       "bands": {

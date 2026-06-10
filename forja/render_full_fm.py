@@ -17,6 +17,7 @@ from scipy.signal import butter, sosfilt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fm_chaos
 import automix
+import arrangement
 from grammar import G
 
 if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8")
@@ -62,7 +63,13 @@ print("  automix: resolviendo faders vs perfil de referencia...")
 gains, pred, err = automix.calibrate(STEMS, fm_lr=(fL, fR), ref_name=REF, save=True)
 print("    " + "  ".join(f"{k}:{v}" for k, v in gains.items()))
 
+# the variation engine: fills, energy staircase, build sweeps, impacts, micro-silence
+plan = arrangement.make_plan(nbars, fm_chaos.sec, seed=4)
+print(f"  arrangement: {len(plan['fill_bars'])} fills, {len(plan['impact_bars'])} impactos, "
+      f"{len(plan['build_hp'])} bars de build, {len(plan['micro_silence'])} micro-silencios")
+
 mL = np.zeros(N); mR = np.zeros(N)
+kpL = np.zeros(N); kpR = np.zeros(N)   # PROCESSED kick (fills/build-HP applied) for the sidechain
 for name in STEM_ORDER:
     p = os.path.join(STEMS, name + ".wav")
     if not os.path.exists(p): print(f"  falta {name}"); continue
@@ -70,12 +77,16 @@ for name in STEM_ORDER:
     if name == "bass" and GROWL_AMOUNT > 0:
         d = automix.growl_saturate(d, GROWL_AMOUNT)   # harmonics 150-300 -> lowmid body
         print(f"  + growl saturation en bass x{GROWL_AMOUNT}")
+    d = arrangement.process_stem(name, d, plan, fm_chaos.BAR)
     fad = gains.get(name, 0.5)
     n = min(N, len(d))
     mL[:n] += d[:n, 0] * fad; mR[:n] += d[:n, 1] * fad
+    if name == "kick":
+        kpL[:n] = d[:n, 0] * fad; kpR[:n] = d[:n, 1] * fad
     print(f"  + {name:6s} x{fad}")
-n = min(N, len(fL))
-mL[:n] += fL[:n] * gains.get("fm", 0.5); mR[:n] += fR[:n] * gains.get("fm", 0.5)
+fmst = arrangement.process_stem("fm", np.column_stack([fL, fR]), plan, fm_chaos.BAR)
+n = min(N, len(fmst))
+mL[:n] += fmst[:n, 0] * gains.get("fm", 0.5); mR[:n] += fmst[:n, 1] * gains.get("fm", 0.5)
 print(f"  + fm     x{gains.get('fm', 0.5)} (chaos-driven)")
 
 # sidechain (kick-env duck, parity with v9)
@@ -84,8 +95,12 @@ km = (kick[:N, 0] + kick[:N, 1]) / 2
 ke = np.abs(km); w = int(0.03 * SR)
 ks = np.convolve(ke, np.ones(w) / w, mode="same"); ks /= (ks.max() + 1e-9)
 sc = 1 - ks * 0.15
-kL = kick[:N, 0] * 0.90; kR = kick[:N, 1] * 0.90
-mL = kL + (mL - kL) * sc; mR = kR + (mR - kR) * sc
+# duck everything EXCEPT the processed kick (raw kick only feeds the envelope)
+mL = kpL + (mL - kpL) * sc; mR = kpR + (mR - kpR) * sc
+
+# mix-level arrangement events (rolls, risers, impacts, the micro-silence weapon)
+mix_ev = arrangement.apply_mix_events(np.column_stack([mL, mR]), plan, fm_chaos.BAR)
+mL, mR = mix_ev[:, 0], mix_ev[:, 1]
 
 # master: HP -> soft sat -> matching EQ LAST (linear phase; the saturator can't
 # undo it) -> normalize. The EQ is the grammar-sanctioned reference-spectrum diff.
@@ -97,6 +112,7 @@ print("  matching EQ vs espectro de referencia...")
 mix = np.column_stack([mL, mR])
 mix, (frq, corr) = automix.match_eq(mix, REF, alpha=1.0, max_db=12.0)
 print(f"    correccion: {corr.min():+.1f}..{corr.max():+.1f} dB")
+arrangement.apply_micro_silence(mix, plan, fm_chaos.BAR)   # the weapon survives the EQ
 mL, mR = mix[:, 0], mix[:, 1]
 pk = max(np.max(np.abs(mL)), np.max(np.abs(mR)))
 if pk > 0: mL /= pk; mR /= pk
