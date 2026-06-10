@@ -16,6 +16,8 @@ from scipy.signal import butter, sosfilt
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fm_chaos
+import automix
+from grammar import G
 
 if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8")
 
@@ -25,10 +27,10 @@ OUT = os.path.join(REPO, "forja", "recreation_out", "DarkPsy_chaosFM.wav")
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 SR = 44100
 
-# (file, fader) — fm is generated fresh, not loaded
-MIX = [("kick.wav", 0.90), ("bass.wav", 0.85), ("acid.wav", 0.55),
-       ("drums.wav", 0.55), ("lead.wav", 0.50), ("pad.wav", 0.40), ("fx.wav", 0.48)]
-FM_FADER = 0.50
+REF = "glosolalia_blueprints"
+GROWL_AMOUNT = 2.0   # bass growl-band saturation -> harmonics fill the lowmid
+STEM_ORDER = ["kick", "bass", "acid", "drums", "lead", "pad", "fx"]
+FM_CACHE = os.path.join(REPO, "forja", "recreation_out", "fm_stem_cache.npy")
 
 def read(path):
     sr, d = wavfile.read(path)
@@ -37,29 +39,44 @@ def read(path):
     elif d.dtype == np.int32: d = d.astype(np.float64) / 2147483648.0
     return d
 
-print("=" * 56); print(" FULL TRACK + chaos-driven FM"); print("=" * 56)
+print("=" * 56); print(" FULL TRACK + chaos-driven FM  (automix vs referencia)"); print("=" * 56)
 
 # length from kick stem
 ref = read(os.path.join(STEMS, "kick.wav"))
 N = len(ref)
+
+# chaos FM stem first (the solver needs to see it); cached for fast iteration
+nbars = int(N / SR / fm_chaos.BAR)
+if os.path.exists(FM_CACHE) and "--fresh-fm" not in sys.argv:
+    print(f"  FM chaos-driven: cache ({FM_CACHE})")
+    fm = np.load(FM_CACHE); fL, fR = fm[0].astype(np.float64), fm[1].astype(np.float64)
+else:
+    print(f"  generando FM chaos-driven ({nbars} bars)...")
+    fL, fR = fm_chaos.render_fm_stem(nbars, gate=True)
+    fpk = max(np.max(np.abs(fL)), np.max(np.abs(fR))) + 1e-9
+    fL = fL / fpk; fR = fR / fpk
+    np.save(FM_CACHE, np.stack([fL, fR]).astype(np.float32))
+
+# solve faders vs the measured reference profile (kick locked = genre anchor)
+print("  automix: resolviendo faders vs perfil de referencia...")
+gains, pred, err = automix.calibrate(STEMS, fm_lr=(fL, fR), ref_name=REF, save=True)
+print("    " + "  ".join(f"{k}:{v}" for k, v in gains.items()))
+
 mL = np.zeros(N); mR = np.zeros(N)
-for fname, fad in MIX:
-    p = os.path.join(STEMS, fname)
-    if not os.path.exists(p): print(f"  falta {fname}"); continue
+for name in STEM_ORDER:
+    p = os.path.join(STEMS, name + ".wav")
+    if not os.path.exists(p): print(f"  falta {name}"); continue
     d = read(p)
+    if name == "bass" and GROWL_AMOUNT > 0:
+        d = automix.growl_saturate(d, GROWL_AMOUNT)   # harmonics 150-300 -> lowmid body
+        print(f"  + growl saturation en bass x{GROWL_AMOUNT}")
+    fad = gains.get(name, 0.5)
     n = min(N, len(d))
     mL[:n] += d[:n, 0] * fad; mR[:n] += d[:n, 1] * fad
-    print(f"  + {fname:10s} x{fad}")
-
-# new chaos FM
-nbars = int(N / SR / fm_chaos.BAR)
-print(f"  generando FM chaos-driven ({nbars} bars)...")
-fL, fR = fm_chaos.render_fm_stem(nbars, gate=True)
-fpk = max(np.max(np.abs(fL)), np.max(np.abs(fR))) + 1e-9
-fL = fL / fpk; fR = fR / fpk
+    print(f"  + {name:6s} x{fad}")
 n = min(N, len(fL))
-mL[:n] += fL[:n] * FM_FADER; mR[:n] += fR[:n] * FM_FADER
-print(f"  + FM (chaos-driven) x{FM_FADER}")
+mL[:n] += fL[:n] * gains.get("fm", 0.5); mR[:n] += fR[:n] * gains.get("fm", 0.5)
+print(f"  + fm     x{gains.get('fm', 0.5)} (chaos-driven)")
 
 # sidechain (kick-env duck, parity with v9)
 kick = read(os.path.join(STEMS, "kick.wav"))
@@ -70,11 +87,17 @@ sc = 1 - ks * 0.15
 kL = kick[:N, 0] * 0.90; kR = kick[:N, 1] * 0.90
 mL = kL + (mL - kL) * sc; mR = kR + (mR - kR) * sc
 
-# light master
+# master: HP -> soft sat -> matching EQ LAST (linear phase; the saturator can't
+# undo it) -> normalize. The EQ is the grammar-sanctioned reference-spectrum diff.
 def hp(x, fc): return sosfilt(butter(2, fc, btype="high", fs=SR, output="sos"), x)
-def ws(x, a=1.7): return np.tanh(x * a) / np.tanh(a)
+def ws(x, a=1.4): return np.tanh(x * a) / np.tanh(a)
 mL = hp(mL, 28); mR = hp(mR, 28)
 mL = ws(mL); mR = ws(mR)
+print("  matching EQ vs espectro de referencia...")
+mix = np.column_stack([mL, mR])
+mix, (frq, corr) = automix.match_eq(mix, REF, alpha=1.0, max_db=12.0)
+print(f"    correccion: {corr.min():+.1f}..{corr.max():+.1f} dB")
+mL, mR = mix[:, 0], mix[:, 1]
 pk = max(np.max(np.abs(mL)), np.max(np.abs(mR)))
 if pk > 0: mL /= pk; mR /= pk
 rms = np.sqrt(np.mean(mL ** 2 + mR ** 2) / 2)
@@ -83,4 +106,9 @@ mL = np.clip(mL * g, -0.98, 0.98); mR = np.clip(mR * g, -0.98, 0.98)
 
 wavfile.write(OUT, SR, np.column_stack([(mL * 32767).astype(np.int16), (mR * 32767).astype(np.int16)]))
 print(f"\n  -> {OUT}  ({N/SR:.0f}s)")
-print("  El FM morphea limpio->alien siguiendo la curva de chaos del track.")
+
+# the gates judge the render before Juan's ears do
+import verify
+results = verify.run_gates(OUT, bpm=G["tempo"]["default_bpm"], ref=REF)
+for name, ok, detail in results:
+    print(f"  [{'PASS' if ok else 'FAIL'}]  {name:8s} {detail}")
