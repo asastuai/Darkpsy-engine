@@ -19,19 +19,19 @@ from scipy.signal import butter, sosfilt
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fm_chaos as fmc
+from grammar import lerp_axis, StyleState
 SR = fmc.SR
 ROOT = fmc.ROOT
 rng = np.random.RandomState(11)
 
-def lerp(a, b, t): return a + (b - a) * t
 def hp_filt(x, fc): return sosfilt(butter(2, fc, btype="high", fs=SR, output="sos"), x)
 
-# ---- hitech_pos -> sub-params (the lerp table) ----
-def tempo_bpm(hp):     return lerp(148, 185, hp)
-def fm_index_combo(chaos, hp): return min(1.0, 0.4 * chaos + hp)   # drives fm_voice index/energy
-def lp_overdrive(hp):  return lerp(1.0, 6.0, hp)                   # tanh drive (metallic)
-def gating_density(hp): return lerp(0.0, 0.7, hp)                  # fraction of 1/16 steps ON
-def brightness(hp):    return lerp(0.0, 0.6, hp)                   # high-shelf-ish blend
+# ---- hitech_pos -> sub-params (the lerp table now lives in grammar.json) ----
+def tempo_bpm(hp):     return lerp_axis("hitech", "tempo_bpm", hp)
+def fm_index_combo(chaos, hp): return StyleState(chaos, hp).fm_index_combo  # drives fm_voice index/energy
+def lp_overdrive(hp):  return lerp_axis("hitech", "lp_overdrive", hp)       # tanh drive (metallic)
+def gating_density(hp): return lerp_axis("hitech", "gating_density", hp)    # fraction of 1/16 steps ON
+def brightness(hp):    return lerp_axis("hitech", "brightness", hp)         # high-shelf-ish blend
 def n_notes_for(chaos, hp): return int(2 + round(hp * 6 + chaos * 1))
 
 # ---- simple kick to feel the tempo ----

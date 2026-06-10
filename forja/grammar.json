@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "description": "DarkPsy engine genre law as DATA. Single source of truth consumed by Python (forja) and TS (mesa). Sources: PRODUCTION_GRAMMAR.md + HITECH_FORMULA.md (multi-agent research, verified; myths already removed). Change a number here -> every renderer obeys.",
+  "tempo": {
+    "default_bpm": 150,
+    "zones": {
+      "darkpsy": [
+        148,
+        160
+      ],
+      "bridge": [
+        160,
+        170
+      ],
+      "hitech": [
+        172,
+        200
+      ],
+      "psycore": [
+        200,
+        220
+      ]
+    }
+  },
+  "axes": {
+    "chaos": {
+      "_": "Axis A - ORDER<->CHAOS: Chowning FM character. integer C:M + low index = harmonic; non-integer + high index = inharmonic/alien.",
+      "fm_ratio": {
+        "from": 2.0,
+        "to": 2.73
+      },
+      "fm_index_start": {
+        "from": 0.5,
+        "to": 3.5
+      },
+      "fm_index_end": {
+        "from": 1.5,
+        "to": 10.5
+      },
+      "note_decay_rate": {
+        "from": 3.0,
+        "to": 1.0,
+        "_": "amp exp decay: ORDER plucky, CHAOS sustained"
+      },
+      "stab_notes_per_bar": {
+        "from": 2,
+        "to": 8
+      }
+    },
+    "hitech": {
+      "_": "Axis B - DARKPSY<->HITECH: one scalar hitech_pos in [0,1] drives everything. Orthogonal to chaos; they multiply.",
+      "tempo_bpm": {
+        "from": 148,
+        "to": 185
+      },
+      "gating_density": {
+        "from": 0.0,
+        "to": 0.7,
+        "_": "leads/FX ONLY, never kick/bass; encode DENSITY, generate pattern random-within-bounds"
+      },
+      "lp_overdrive": {
+        "from": 1.0,
+        "to": 6.0
+      },
+      "brightness": {
+        "from": 0.0,
+        "to": 0.6
+      },
+      "reverb_decay_ms": {
+        "from": 2000,
+        "to": 400
+      },
+      "fm_index_combo_chaos_weight": 0.4
+    }
+  },
+  "atmosphere": {
+    "_": "Juan's law (2026-06-09): where the FM voice + chaos sound, notes are ELONGATED with volume gradients = atmosphere, not a stab machine-gun.",
+    "pad_chaos_threshold": 0.5,
+    "pad_bars": 2.5,
+    "pad_every_bars": 2,
+    "rise_range": [
+      0.35,
+      0.6
+    ],
+    "voices": [
+      {
+        "offset": 0,
+        "pan": -0.55
+      },
+      {
+        "offset": 7,
+        "pan": 0.55
+      }
+    ],
+    "level": 0.55,
+    "drift_hz": 0.13,
+    "accent_stabs_per_bar": 2
+  },
+  "sections": {
+    "chaos_levels": {
+      "order": 0.0,
+      "chaos": 1.0,
+      "drop": 0.4,
+      "silence": 0.0,
+      "intro": 0.05,
+      "outro": 0.05,
+      "break": 0.1
+    },
+    "build_ramp": {
+      "from": 0.1,
+      "to": 0.7
+    }
+  },
+  "kick": {
+    "fundamental_hz": [
+      40,
+      55
+    ],
+    "click_band_hz": [
+      2500,
+      7000
+    ],
+    "mud_notch_hz": [
+      250,
+      400
+    ],
+    "mud_notch_db": [
+      -12,
+      -6
+    ],
+    "over_bass_db": [
+      2,
+      3
+    ],
+    "four_on_floor": true,
+    "humanize": false
+  },
+  "bass": {
+    "pattern": "KBBB_16ths",
+    "phase_reset_on_note": true,
+    "max_decay_ms_formula": "60000 / BPM / 4 * 0.6",
+    "note_len_frac_of_16th": [
+      0.7,
+      0.8
+    ]
+  },
+  "sidechain": {
+    "type": "drawn_duck_not_compressor",
+    "depth_db": [
+      3,
+      6
+    ],
+    "release_div_darkpsy": 4,
+    "release_div_hitech": 8
+  },
+  "mix": {
+    "mono_below_hz": 110,
+    "limiter_dbtp": -1.0,
+    "lufs_club": -8,
+    "headroom_db": [
+      3,
+      6
+    ],
+    "_": "Band targets are NOT invented percentages (debunked myth) - renders are compared against measured reference_profiles below."
+  },
+  "verify": {
+    "bands_hz": {
+      "sub": [
+        20,
+        60
+      ],
+      "bass": [
+        60,
+        250
+      ],
+      "lowmid": [
+        250,
+        800
+      ],
+      "mid": [
+        800,
+        3000
+      ],
+      "high": [
+        3000,
+        10000
+      ],
+      "air": [
+        10000,
+        20000
+      ]
+    },
+    "peak_db": [
+      -6.0,
+      -0.1
+    ],
+    "rms_db": [
+      -16.0,
+      -6.5
+    ],
+    "dc_max": 0.02,
+    "max_silence_s": 4.0,
+    "band_tolerance": 0.1,
+    "bpm_tolerance": 3.0,
+    "mono_below_corr_min": 0.9
+  },
+  "reference_profiles": {
+    "glosolalia_blueprints": {
+      "bands": {
+        "sub": 0.0781,
+        "bass": 0.5807,
+        "lowmid": 0.2217,
+        "mid": 0.0799,
+        "high": 0.0321,
+        "air": 0.0075
+      },
+      "rms_db": -9.3,
+      "peak_db": -0.3,
+      "source": "Glosolalia - Blueprints.wav"
+    }
+  }
+}
