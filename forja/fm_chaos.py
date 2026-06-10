@@ -61,7 +61,7 @@ def chaos_at(bar):
 _HM = G["sections"].get("hitech_moment")
 def hitech_at(bar):
     """Per-bar HITECH 0..peak: trapezoid over the hitech_moment window (Axis B)."""
-    if not _HM:
+    if not _HM or not _HM.get("enabled", True):
         return 0.0
     s0, s1 = _HM["bars"]
     if not (s0 <= bar < s1):

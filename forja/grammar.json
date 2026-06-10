@@ -111,7 +111,8 @@
       "to": 0.7
     },
     "hitech_moment": {
-      "_": "Momento hitech: ventana de bars donde hitech_pos rampa 0->peak->0 (trapecio). Con stems horneados el tempo NO rampa; rampan gating/overdrive/brightness/densidad FM. La rampa de tempo llega en Fase C (motor en vivo).",
+      "_": "DESACTIVADO (decision Juan 2026-06-10): darkpsy y hitech van como proyectos separados; mezclados no se nota ni suena bien. El codigo queda listo para el proyecto hitech futuro. enabled=true lo reactiva.",
+      "enabled": false,
       "bars": [
         213,
         241
