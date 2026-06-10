@@ -58,6 +58,21 @@ def chaos_at(bar):
         return lerp(_BUILD["from"], _BUILD["to"], (bar - bs) / max(be - bs, 1))
     return _CA.get(s, 0.0)
 
+_HM = G["sections"].get("hitech_moment")
+def hitech_at(bar):
+    """Per-bar HITECH 0..peak: trapezoid over the hitech_moment window (Axis B)."""
+    if not _HM:
+        return 0.0
+    s0, s1 = _HM["bars"]
+    if not (s0 <= bar < s1):
+        return 0.0
+    ri, ro, pk = _HM["ramp_in_bars"], _HM["ramp_out_bars"], _HM["peak"]
+    if bar < s0 + ri:
+        return pk * (bar - s0 + 1) / ri
+    if bar >= s1 - ro:
+        return pk * (s1 - bar) / ro
+    return pk
+
 # ---------------- 2-operator FM voice (Chowning) ----------------
 def ratio_for_chaos(c):
     """Integer (harmonic) at ORDER -> non-integer (inharmonic) at CHAOS."""
@@ -133,6 +148,9 @@ def _schedule_bar(L, R, total, ab, tbar, rng, verbose=False):
     CHAOS (>=PAD_CHAOS): ATMOSPHERE — elongated notes with volume gradients
     (every 2nd bar, two voices overlapping) + 2 sparse accent stabs for rhythm."""
     c = chaos_at(ab)
+    hp = hitech_at(ab)
+    # hitech pushes the stab index/energy up without touching the pad identity
+    c_idx = max(c, min(1.0, 0.4 * c + hp)) if hp > 0 else c
     ratio = ratio_for_chaos(c)
     if c >= PAD_CHAOS:
         n_notes = _ATMO["accent_stabs_per_bar"]  # sparse accents; the atmosphere carries the bar
@@ -149,16 +167,20 @@ def _schedule_bar(L, R, total, ab, tbar, rng, verbose=False):
                 _mix(L, R, l, r, tbar, total)
     else:
         n_notes = int(round(lerp_axis("chaos", "stab_notes_per_bar", c)))
+    n_notes = min(16, n_notes + int(round(hp * 4)))   # hitech = denser stabs
     step = 16 // max(1, n_notes)
     for k in range(n_notes):
         off = PHRASE[(ab * n_notes + k) % len(PHRASE)]
         if c > 0.5 and rng.random() < 0.4:
             off += rng.choice([-1, 1, 2])
+        if hp > 0.5 and rng.random() < 0.3:
+            off += 12   # the hitech octave-jump signature
         carrier = nf(ROOT + off)
         dur = S16 * (1.5 if c < 0.3 else (0.8 + rng.random() * 1.2))
+        dur *= lerp(1.0, 0.55, hp)   # tighter notes as hitech rises
         t0 = tbar + k * step * S16 + (rng.normal(0, 0.004) if c > 0.4 else 0)
-        pan = rng.uniform(-0.4, 0.4) * c
-        l, r = fm_voice(carrier, ratio, c, dur, pan)
+        pan = rng.uniform(-0.4, 0.4) * max(c, hp)
+        l, r = fm_voice(carrier, ratio, c_idx, dur, pan)
         _mix(L, R, l, r, t0, total)
     if verbose:
         kind = "ATMOS+2" if c >= PAD_CHAOS else f"stabs:{n_notes}"

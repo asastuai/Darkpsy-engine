@@ -26,11 +26,12 @@ import numpy as np
 from scipy.signal import butter, sosfilt
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from grammar import G, lerp
+from grammar import G, lerp, lerp_axis
 
 SR = 44100
 A = G["arrangement"]
 KICKBASS = ("kick", "bass")
+HITECH_GATED = ("acid", "lead", "fx", "fm")   # gating NEVER touches kick/bass (grammar law)
 
 
 def _hp(x, fc):
@@ -189,6 +190,55 @@ def process_stem(name, stereo, plan, BAR):
                 a, b = _bar_slice(bar, BAR, n)
                 cut = b - int((b - a) * 0.5)
                 env[cut:b] = 0.25   # duck drums under the roll
+        out = out * env[:, None]
+    return out
+
+
+def apply_hitech(name, stereo, BAR, hitech_fn, seed=23):
+    """Momento hitech (Axis B) over baked stems: per-bar trance-gate on leads/FX
+    (density from grammar, downbeats kept) + overdrive/brightness on the fm stem.
+    Tempo does NOT ramp here (stems are baked) — that arrives with Fase C."""
+    if name not in HITECH_GATED:
+        return stereo
+    n = len(stereo)
+    rng = np.random.RandomState(seed + sum(ord(ch) for ch in name))
+    out = stereo
+    n_bars = int(np.ceil(n / (BAR * SR)))
+    env = None
+    for bar in range(n_bars):
+        hp = hitech_fn(bar)
+        if hp <= 0.02:
+            continue
+        a, b = _bar_slice(bar, BAR, n)
+        dens = lerp_axis("hitech", "gating_density", hp)
+        if dens > 0.02:
+            if env is None:
+                env = np.ones(n)
+            step = int(BAR / 16 * SR)
+            ramp = max(8, int(0.001 * SR))
+            for s in range((b - a) // step + 1):
+                sa, sb = a + s * step, min(a + (s + 1) * step, b)
+                if sb <= sa:
+                    continue
+                # dens = fraccion CORTADA (sube con hitech); downbeats siempre quedan
+                on = rng.random() >= dens or s % 4 == 0
+                if not on:
+                    env[sa:sb] = 0.0
+                    if sa - ramp > 0:
+                        env[sa - ramp:sa] = np.minimum(env[sa - ramp:sa], np.linspace(1, 0, ramp))
+                    if sb + ramp < n:
+                        env[sb:sb + ramp] = np.minimum(env[sb:sb + ramp], np.linspace(0, 1, ramp))
+        if name == "fm":
+            dr = lerp_axis("hitech", "lp_overdrive", hp)
+            bz = lerp_axis("hitech", "brightness", hp)
+            seg = out[a:b].copy()
+            seg = np.tanh(seg * dr) / np.tanh(dr)            # metallic zing
+            if bz > 0.02:
+                for ch in range(2):
+                    seg[:, ch] += bz * _hp(seg[:, ch], 3000)  # brightness blend
+            out = out.copy() if out is stereo else out
+            out[a:b] = seg
+    if env is not None:
         out = out * env[:, None]
     return out
 

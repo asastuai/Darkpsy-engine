@@ -65,8 +65,12 @@ print("    " + "  ".join(f"{k}:{v}" for k, v in gains.items()))
 
 # the variation engine: fills, energy staircase, build sweeps, impacts, micro-silence
 plan = arrangement.make_plan(nbars, fm_chaos.sec, seed=4)
+ht_bars = [b for b in range(nbars) if fm_chaos.hitech_at(b) > 0.02]
 print(f"  arrangement: {len(plan['fill_bars'])} fills, {len(plan['impact_bars'])} impactos, "
       f"{len(plan['build_hp'])} bars de build, {len(plan['micro_silence'])} micro-silencios")
+if ht_bars:
+    print(f"  momento hitech: bars {ht_bars[0]}-{ht_bars[-1]} "
+          f"(peak {max(fm_chaos.hitech_at(b) for b in ht_bars):.2f})")
 
 mL = np.zeros(N); mR = np.zeros(N)
 kpL = np.zeros(N); kpR = np.zeros(N)   # PROCESSED kick (fills/build-HP applied) for the sidechain
@@ -78,6 +82,7 @@ for name in STEM_ORDER:
         d = automix.growl_saturate(d, GROWL_AMOUNT)   # harmonics 150-300 -> lowmid body
         print(f"  + growl saturation en bass x{GROWL_AMOUNT}")
     d = arrangement.process_stem(name, d, plan, fm_chaos.BAR)
+    d = arrangement.apply_hitech(name, d, fm_chaos.BAR, fm_chaos.hitech_at)
     fad = gains.get(name, 0.5)
     n = min(N, len(d))
     mL[:n] += d[:n, 0] * fad; mR[:n] += d[:n, 1] * fad
@@ -85,6 +90,7 @@ for name in STEM_ORDER:
         kpL[:n] = d[:n, 0] * fad; kpR[:n] = d[:n, 1] * fad
     print(f"  + {name:6s} x{fad}")
 fmst = arrangement.process_stem("fm", np.column_stack([fL, fR]), plan, fm_chaos.BAR)
+fmst = arrangement.apply_hitech("fm", fmst, fm_chaos.BAR, fm_chaos.hitech_at)
 n = min(N, len(fmst))
 mL[:n] += fmst[:n, 0] * gains.get("fm", 0.5); mR[:n] += fmst[:n, 1] * gains.get("fm", 0.5)
 print(f"  + fm     x{gains.get('fm', 0.5)} (chaos-driven)")
@@ -122,6 +128,13 @@ mL = np.clip(mL * g, -0.98, 0.98); mR = np.clip(mR * g, -0.98, 0.98)
 
 wavfile.write(OUT, SR, np.column_stack([(mL * 32767).astype(np.int16), (mR * 32767).astype(np.int16)]))
 print(f"\n  -> {OUT}  ({N/SR:.0f}s)")
+# versioned listening copy (the player locks files; never overwrite what Juan has open)
+if "--listen" in sys.argv:
+    tag = sys.argv[sys.argv.index("--listen") + 1]
+    import shutil
+    dst = os.path.join(os.path.expanduser("~"), "Desktop", f"DarkPsy_{tag}.wav")
+    shutil.copy2(OUT, dst)
+    print(f"  -> copia para escuchar: {dst}")
 
 # the gates judge the render before Juan's ears do
 import verify

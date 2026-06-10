@@ -56,7 +56,7 @@
       "gating_density": {
         "from": 0.0,
         "to": 0.7,
-        "_": "leads/FX ONLY, never kick/bass; encode DENSITY, generate pattern random-within-bounds"
+        "_": "leads/FX ONLY, never kick/bass; fraction of 1/16 steps CHOPPED (rises with hitech); downbeats always kept; generate pattern random-within-bounds"
       },
       "lp_overdrive": {
         "from": 1.0,
@@ -109,6 +109,16 @@
     "build_ramp": {
       "from": 0.1,
       "to": 0.7
+    },
+    "hitech_moment": {
+      "_": "Momento hitech: ventana de bars donde hitech_pos rampa 0->peak->0 (trapecio). Con stems horneados el tempo NO rampa; rampan gating/overdrive/brightness/densidad FM. La rampa de tempo llega en Fase C (motor en vivo).",
+      "bars": [
+        213,
+        241
+      ],
+      "ramp_in_bars": 10,
+      "ramp_out_bars": 6,
+      "peak": 0.85
     }
   },
   "kick": {
