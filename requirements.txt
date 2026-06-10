@@ -1,0 +1,26 @@
+# DarkPsy Engine — pinned deps (Python 3.12, Windows)
+# torch/torchaudio: CPU builds. Install with:
+#   pip install torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+# (2.6.0 is the sweet spot: works with numpy 2.x and demucs 4.0.1 without torchcodec/ffmpeg)
+torch==2.6.0
+torchaudio==2.6.0
+numpy==2.4.2
+scipy==1.17.1
+
+# Separation + analysis
+demucs==4.0.1
+librosa==0.11.0
+soundfile==0.13.1
+
+# COOK backend (localhost only)
+fastapi==0.135.2
+uvicorn==0.42.0
+python-multipart==0.0.32
+
+# Reaper live agent (OSC)
+python-osc==1.10.2
+
+# Research/transcription (optional)
+faster-whisper==1.2.1
+yt-dlp==2026.3.17
+av==17.1.0

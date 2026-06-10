@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 2,
+  "seed": 666,
+  "bpm": 150,
+  "root": "E",
+  "presets": [
+    {
+      "id": "orden",
+      "label": "Orden",
+      "desc": "Groove hipnotico 4/4. Bass rodante, acid y lead. Para bailar.",
+      "loop": {
+        "bars": 29,
+        "durationSec": 46.4,
+        "sourceBars": [
+          91,
+          120
+        ]
+      },
+      "smap": [
+        {
+          "label": "order",
+          "startBar": 0,
+          "endBar": 29,
+          "chaos": 0.0
+        }
+      ],
+      "stems": [
+        {
+          "name": "kick",
+          "label": "Kick",
+          "url": "stems/orden/kick.wav",
+          "defaultGain": 0.9,
+          "band": "sub",
+          "color": "#ff2d55",
+          "tip": "El thud grave que maneja el ritmo. 40-80 Hz.",
+          "rmsDb": -15.2
+        },
+        {
+          "name": "bass",
+          "label": "Bass",
+          "url": "stems/orden/bass.wav",
+          "defaultGain": 0.85,
+          "band": "bass",
+          "color": "#ff7a00",
+          "tip": "El bajo rodante. La columna del dark psy. 60-200 Hz.",
+          "rmsDb": -15.7
+        },
+        {
+          "name": "drums",
+          "label": "Drums",
+          "url": "stems/orden/drums.wav",
+          "defaultGain": 0.55,
+          "band": "high",
+          "color": "#00e5ff",
+          "tip": "Hi-hats y claps. El shuffle que respira. 6-12 kHz.",
+          "rmsDb": -28.6
+        },
+        {
+          "name": "acid",
+          "label": "Acid",
+          "url": "stems/orden/acid.wav",
+          "defaultGain": 0.55,
+          "band": "mid",
+          "color": "#00ff88",
+          "tip": "La linea acida squelchy (estilo 303). 300 Hz-2 kHz.",
+          "rmsDb": -26.1
+        },
+        {
+          "name": "lead",
+          "label": "Lead",
+          "url": "stems/orden/lead.wav",
+          "defaultGain": 0.5,
+          "band": "mid-high",
+          "color": "#b388ff",
+          "tip": "La melodia etereal, atras en el mix. 1-4 kHz.",
+          "rmsDb": -18.1
+        },
+        {
+          "name": "pad",
+          "label": "Pad",
+          "url": "stems/orden/pad.wav",
+          "defaultGain": 0.4,
+          "band": "low-mid",
+          "color": "#4488ff",
+          "tip": "El colchon atmosferico que da espacio. 200-600 Hz.",
+          "rmsDb": -14.6
+        },
+        {
+          "name": "fx",
+          "label": "FX",
+          "url": "stems/orden/fx.wav",
+          "defaultGain": 0.48,
+          "band": "full",
+          "color": "#ffffff",
+          "tip": "Risers e impactos. Tension y transiciones.",
+          "rmsDb": -22.8
+        }
+      ]
+    },
+    {
+      "id": "caos",
+      "label": "Caos",
+      "desc": "Tormenta FM, patrones irregulares. Para perder la cabeza.",
+      "loop": {
+        "bars": 24,
+        "durationSec": 38.4,
+        "sourceBars": [
+          124,
+          148
+        ]
+      },
+      "smap": [
+        {
+          "label": "chaos",
+          "startBar": 0,
+          "endBar": 24,
+          "chaos": 1.0
+        }
+      ],
+      "stems": [
+        {
+          "name": "kick",
+          "label": "Kick",
+          "url": "stems/caos/kick.wav",
+          "defaultGain": 0.9,
+          "band": "sub",
+          "color": "#ff2d55",
+          "tip": "El thud grave que maneja el ritmo. 40-80 Hz.",
+          "rmsDb": -14.5
+        },
+        {
+          "name": "bass",
+          "label": "Bass",
+          "url": "stems/caos/bass.wav",
+          "defaultGain": 0.85,
+          "band": "bass",
+          "color": "#ff7a00",
+          "tip": "El bajo rodante. La columna del dark psy. 60-200 Hz.",
+          "rmsDb": -15.6
+        },
+        {
+          "name": "drums",
+          "label": "Drums",
+          "url": "stems/caos/drums.wav",
+          "defaultGain": 0.55,
+          "band": "high",
+          "color": "#00e5ff",
+          "tip": "Hi-hats y claps. El shuffle que respira. 6-12 kHz.",
+          "rmsDb": -35.3
+        },
+        {
+          "name": "acid",
+          "label": "Acid",
+          "url": "stems/caos/acid.wav",
+          "defaultGain": 0.55,
+          "band": "mid",
+          "color": "#00ff88",
+          "tip": "La linea acida squelchy (estilo 303). 300 Hz-2 kHz.",
+          "rmsDb": -24.7
+        },
+        {
+          "name": "pad",
+          "label": "Pad",
+          "url": "stems/caos/pad.wav",
+          "defaultGain": 0.4,
+          "band": "low-mid",
+          "color": "#4488ff",
+          "tip": "El colchon atmosferico que da espacio. 200-600 Hz.",
+          "rmsDb": -14.6
+        },
+        {
+          "name": "fm",
+          "label": "FM",
+          "url": "stems/caos/fm.wav",
+          "defaultGain": 0.45,
+          "band": "high",
+          "color": "#ff00bb",
+          "tip": "Texturas FM alienigenas (caos). Esparcidas.",
+          "rmsDb": -20.5
+        }
+      ]
+    },
+    {
+      "id": "tension",
+      "label": "Tension",
+      "desc": "Build que sube: el kick se densifica antes del estallido.",
+      "loop": {
+        "bars": 10,
+        "durationSec": 16.0,
+        "sourceBars": [
+          165,
+          175
+        ]
+      },
+      "smap": [
+        {
+          "label": "build",
+          "startBar": 0,
+          "endBar": 10,
+          "chaos": 0.5
+        }
+      ],
+      "stems": [
+        {
+          "name": "kick",
+          "label": "Kick",
+          "url": "stems/tension/kick.wav",
+          "defaultGain": 0.9,
+          "band": "sub",
+          "color": "#ff2d55",
+          "tip": "El thud grave que maneja el ritmo. 40-80 Hz.",
+          "rmsDb": -15.8
+        },
+        {
+          "name": "bass",
+          "label": "Bass",
+          "url": "stems/tension/bass.wav",
+          "defaultGain": 0.85,
+          "band": "bass",
+          "color": "#ff7a00",
+          "tip": "El bajo rodante. La columna del dark psy. 60-200 Hz.",
+          "rmsDb": -15.8
+        },
+        {
+          "name": "drums",
+          "label": "Drums",
+          "url": "stems/tension/drums.wav",
+          "defaultGain": 0.55,
+          "band": "high",
+          "color": "#00e5ff",
+          "tip": "Hi-hats y claps. El shuffle que respira. 6-12 kHz.",
+          "rmsDb": -28.2
+        },
+        {
+          "name": "acid",
+          "label": "Acid",
+          "url": "stems/tension/acid.wav",
+          "defaultGain": 0.55,
+          "band": "mid",
+          "color": "#00ff88",
+          "tip": "La linea acida squelchy (estilo 303). 300 Hz-2 kHz.",
+          "rmsDb": -24.5
+        },
+        {
+          "name": "pad",
+          "label": "Pad",
+          "url": "stems/tension/pad.wav",
+          "defaultGain": 0.4,
+          "band": "low-mid",
+          "color": "#4488ff",
+          "tip": "El colchon atmosferico que da espacio. 200-600 Hz.",
+          "rmsDb": -14.9
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,22 @@
 *.wav
 *.mid
+*.mp3
+*.flac
 installers/
 __pycache__/
 *.pyc
+
+# Derived from copyrighted audio — NEVER commit/distribute (private recreation use only)
+forja/recreation_out/
+forja/separated/
+mesa/public/recreations/
+
+# YouTube caption transcripts — research-only, not ours to redistribute
+forja/research_transcripts/
+
+# Heavy/derived local artifacts
+stems_v9/
+reaper_agent/Backups/
+*.rpp-bak
+*.reapeaks
+*.tsbuildinfo
