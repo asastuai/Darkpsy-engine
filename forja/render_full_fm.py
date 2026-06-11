@@ -29,6 +29,8 @@ os.makedirs(os.path.dirname(OUT), exist_ok=True)
 SR = 44100
 
 REF = "glosolalia_blueprints"
+if "--ref" in sys.argv:
+    REF = sys.argv[sys.argv.index("--ref") + 1]   # e.g. --ref darkpsy_consensus
 GROWL_AMOUNT = 2.0   # bass growl-band saturation -> harmonics fill the lowmid
 STEM_ORDER = ["kick", "bass", "acid", "drums", "lead", "pad", "fx"]
 FM_CACHE = os.path.join(REPO, "forja", "recreation_out", "fm_stem_cache.npy")
