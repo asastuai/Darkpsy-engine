@@ -20,3 +20,5 @@ reaper_agent/Backups/
 *.rpp-bak
 *.reapeaks
 *.tsbuildinfo
+forja/als_private/
+forja/reference_audio/
