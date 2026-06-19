@@ -127,7 +127,7 @@ _BSB_RIFF = [
 VOICES = {"bsb_everybody_bass": bsb_everybody_bass}
 
 
-def render_riff(voice_fn, bpm, riff=_BSB_RIFF, gate=0.92, p=None, loops=2):
+def render_riff(voice_fn, bpm, riff=_BSB_RIFF, gate=0.92, p=None, loops=2, root_midi=_A1):
     s16 = 60.0 / bpm / 4.0
     total = int(sum(d for _, d in riff) * s16 * SR * loops) + SR
     out = np.zeros(total)
@@ -135,7 +135,7 @@ def render_riff(voice_fn, bpm, riff=_BSB_RIFF, gate=0.92, p=None, loops=2):
     for _ in range(loops):
         for off, d in riff:
             dur = d * s16
-            note = voice_fn(_A1 + off, dur * gate, p)
+            note = voice_fn(root_midi + off, dur * gate, p)
             e = min(pos + len(note), total)
             out[pos:e] += note[:e - pos]
             pos += int(dur * SR)

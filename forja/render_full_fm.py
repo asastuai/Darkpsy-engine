@@ -80,6 +80,11 @@ for name in STEM_ORDER:
     p = os.path.join(STEMS, name + ".wav")
     if not os.path.exists(p): print(f"  falta {name}"); continue
     d = read(p)
+    hp_fc = G["mix"].get("highpass_hz", {}).get(name)
+    if hp_fc:   # disciplina del amigo: low-end solo para kick+bass = mezcla amena
+        sos = butter(2, hp_fc, btype="high", fs=SR, output="sos")
+        d = np.column_stack([sosfilt(sos, d[:, 0]), sosfilt(sos, d[:, 1])])
+        print(f"  hp {name} @ {hp_fc} Hz")
     if name == "bass" and GROWL_AMOUNT > 0:
         d = automix.growl_saturate(d, GROWL_AMOUNT)   # harmonics 150-300 -> lowmid body
         print(f"  + growl saturation en bass x{GROWL_AMOUNT}")

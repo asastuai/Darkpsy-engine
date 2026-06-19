@@ -175,15 +175,22 @@
     "_": "Band targets are NOT invented percentages (debunked myth) - renders are compared against measured reference_profiles below.",
     "stem_gains": {
       "kick": 0.9,
-      "bass": 0.723,
-      "acid": 1.4,
+      "bass": 1.158,
+      "acid": 1.386,
       "drums": 1.4,
       "lead": 0.05,
-      "pad": 0.05,
-      "fx": 0.05,
+      "pad": 0.491,
+      "fx": 0.229,
       "fm": 0.6
     },
-    "stem_gains_ref": "glosolalia_blueprints"
+    "stem_gains_ref": "darkpsy_consensus",
+    "_highpass": "Disciplina del amigo (ULTIMOREAPER.RPP): high-pass en TODO menos kick/bass/drums para que el low-end sea de kick+bass = mezcla 'amena', cierra el agujero de low-mid.",
+    "highpass_hz": {
+      "acid": 221,
+      "pad": 479,
+      "lead": 678,
+      "fx": 891
+    }
   },
   "verify": {
     "bands_hz": {
