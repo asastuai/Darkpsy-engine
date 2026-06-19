@@ -1,0 +1,195 @@
+{
+ "source": "ULTIMOREAPER.RPP",
+ "tempo": 132.0,
+ "tracks": [
+  {
+   "name": "ACID",
+   "vol": 0.9623,
+   "pan": 0.0,
+   "fx": [
+    {
+     "plugin": "VST: ReaEQ (Cockos)",
+     "preset": null,
+     "eq_bands": [
+      {
+       "type": 4,
+       "on": true,
+       "freq_hz": 221.4,
+       "gain_db": 0.0,
+       "bw_oct": 1.42
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "BASS",
+   "vol": 0.5076,
+   "pan": 0.0,
+   "fx": [
+    {
+     "plugin": "JS:pitch/octavedown",
+     "params": "150 0.5 0 -120"
+    },
+    {
+     "plugin": "VST: ReaEQ (Cockos)",
+     "preset": null,
+     "eq_bands": [
+      {
+       "type": 0,
+       "on": true,
+       "freq_hz": 379.4,
+       "gain_db": -1.88,
+       "bw_oct": 0.8
+      }
+     ]
+    },
+    {
+     "plugin": "VST3: KranchDD (KINDZAudio)",
+     "preset": null,
+     "distortion": {
+      "flt": 138.0,
+      "dst": 0.496,
+      "mix": 0.33,
+      "qm": 2.687,
+      "morph": 0.34,
+      "feedback": 0.004,
+      "type": 9.0,
+      "chain": 1.0,
+      "clip": 0.0,
+      "overx": 0.0
+     }
+    },
+    {
+     "plugin": "VST: ReaComp (Cockos)",
+     "preset": null
+    }
+   ]
+  },
+  {
+   "name": "DRUMS",
+   "vol": 0.1455,
+   "pan": -0.112,
+   "fx": [
+    {
+     "plugin": "VST: ReaEQ (Cockos)",
+     "preset": null,
+     "eq_bands": [
+      {
+       "type": 0,
+       "on": true,
+       "freq_hz": 1483.4,
+       "gain_db": -120.0,
+       "bw_oct": 0.8
+      }
+     ]
+    },
+    {
+     "plugin": "VST: ReaVerb (Cockos)",
+     "preset": null
+    }
+   ]
+  },
+  {
+   "name": "FM",
+   "vol": 0.2725,
+   "pan": -0.408,
+   "fx": []
+  },
+  {
+   "name": "FX",
+   "vol": 0.229,
+   "pan": 0.0,
+   "fx": [
+    {
+     "plugin": "VST: ReaEQ (Cockos)",
+     "preset": null,
+     "eq_bands": [
+      {
+       "type": 4,
+       "on": true,
+       "freq_hz": 891.1,
+       "gain_db": -6.3,
+       "bw_oct": 1.58
+      }
+     ]
+    },
+    {
+     "plugin": "VST: ReaDelay (Cockos)",
+     "preset": null
+    },
+    {
+     "plugin": "VST: ReaSurroundPan (Cockos)",
+     "preset": null
+    },
+    {
+     "plugin": "JS:delay/delay_chorus",
+     "params": "1120 -6 -6 -6 0 500 41"
+    }
+   ]
+  },
+  {
+   "name": "KICK",
+   "vol": 0.4783,
+   "pan": 0.0,
+   "fx": [
+    {
+     "plugin": "VST: ReaComp (Cockos)",
+     "preset": null
+    },
+    {
+     "plugin": "JS:sstillwell/thunderkick",
+     "params": "-26.7 4 0 1"
+    }
+   ]
+  },
+  {
+   "name": "LEAD",
+   "vol": 0.6661,
+   "pan": 0.0,
+   "fx": [
+    {
+     "plugin": "VST: ReaEQ (Cockos)",
+     "preset": null,
+     "eq_bands": [
+      {
+       "type": 4,
+       "on": true,
+       "freq_hz": 678.0,
+       "gain_db": 0.0,
+       "bw_oct": 0.8
+      }
+     ]
+    },
+    {
+     "plugin": "VST: ReaDelay (Cockos)",
+     "preset": null
+    },
+    {
+     "plugin": "JS:guitar/amp-model-dual",
+     "params": "\"Fender Bassman"
+    }
+   ]
+  },
+  {
+   "name": "PAD",
+   "vol": 1.0476,
+   "pan": 0.0,
+   "fx": [
+    {
+     "plugin": "VST: ReaEQ (Cockos)",
+     "preset": null,
+     "eq_bands": [
+      {
+       "type": 4,
+       "on": true,
+       "freq_hz": 479.1,
+       "gain_db": -120.0,
+       "bw_oct": 0.8
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
