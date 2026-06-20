@@ -18,6 +18,8 @@ from audio_io import load
 SR = 44100
 WHISTLE = os.path.join(os.path.expanduser("~"), "Desktop", "twisted_nerve.wav")
 T_DROP = float(sys.argv[1]) if len(sys.argv) > 1 else 21.0
+USE_REAPER = "--synth" not in sys.argv   # default: la base de Reaper de Juan
+STEMS = os.path.join(os.path.expanduser("~"), "Desktop", "DarkPsy_techno132_stems")
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -73,6 +75,39 @@ def disintegrate(x, dur=3.4):
     return out
 
 
+def reaper_base_beat(nbars):
+    """La base que viene haciendo Juan en Reaper: stems techno132 + mezcla del
+    amigo (volúmenes + high-pass + drive Kranch en bass), FM y lead MUTEADOS.
+    Devuelve el tramo de nbars más energético (para que el drop entre arriba)."""
+    from scipy.io import wavfile
+    from scipy.signal import butter, sosfilt
+    vols = {"kick": 0.478, "bass": 0.508, "drums": 0.145, "acid": 0.962,
+            "pad": 1.048, "fx": 0.229}                 # del mix_template del amigo
+    hpf = {"acid": 221, "pad": 479, "fx": 891}         # disciplina high-pass
+    mix = None
+    N = 0
+    for name, v in vols.items():
+        sr, d = wavfile.read(os.path.join(STEMS, name + ".wav"))
+        x = (d.mean(axis=1) if d.ndim > 1 else d).astype(np.float64) / 32768.0
+        if name in hpf:
+            x = sosfilt(butter(2, hpf[name], btype="high", fs=SR, output="sos"), x)
+        if name == "bass":
+            x = np.tanh(x * 2.0) / np.tanh(2.0)         # drive tipo Kranch
+        if mix is None:
+            mix = np.zeros(len(x)); N = len(x)
+        n = min(N, len(x)); mix[:n] += x[:n] * v
+    barlen = int(cine.BAR * SR); win = nbars * barlen
+    best_e, best_s = 0.0, 0
+    for s in range(0, max(1, len(mix) - win), barlen * 2):
+        e = float(np.sum(mix[s:s + win] ** 2))
+        if e > best_e:
+            best_e, best_s = e, s
+    chunk = mix[best_s:best_s + win].copy()
+    r = int(0.004 * SR); chunk[:r] *= np.linspace(0, 1, r)   # anti-click
+    print(f"  base Reaper: tramo más energético en {best_s/SR:.0f}s ({nbars} compases)")
+    return chunk
+
+
 def main():
     w, sr = load(WHISTLE)
     wm = w.mean(axis=1)
@@ -95,8 +130,12 @@ def main():
 
     # 2) en T_DROP: impacto + beat + el silbido se desintegra
     cine.add(M, cine.impact(), T_DROP, 0.9)
-    beatbuf = np.zeros(int(beat_dur * SR) + SR)
-    cine.groove(beatbuf, 0, nbeat_bars, level=1.0)
+    if USE_REAPER:
+        beatbuf = reaper_base_beat(nbeat_bars)
+        beatbuf = beatbuf / (np.max(np.abs(beatbuf)) + 1e-9) * 0.95
+    else:
+        beatbuf = np.zeros(int(beat_dur * SR) + SR)
+        cine.groove(beatbuf, 0, nbeat_bars, level=1.0)
     e = min(a + len(beatbuf), total)
     M[a:e] += beatbuf[:e - a]
 
