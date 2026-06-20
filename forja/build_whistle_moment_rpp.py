@@ -24,9 +24,9 @@ DESKTOP = os.path.join(os.path.expanduser("~"), "Desktop")
 BASE_RPP = os.path.join(DESKTOP, "ULTIMOREAPER.RPP")
 STEMS = os.path.join(DESKTOP, "DarkPsy_techno132_stems")
 WHISTLE = os.path.join(DESKTOP, "twisted_nerve.wav")
-OUT = os.path.join(DESKTOP, "ULTIMOREAPER_cine.RPP")
 SR = 44100
 T_DROP = float(sys.argv[1]) if len(sys.argv) > 1 else 21.0
+OUT = os.path.join(DESKTOP, "SILBIDO_drop_%s.RPP" % str(T_DROP).replace(".", "_"))
 MUTE = set()              # no muteamos nada: la base TAL CUAL está
 
 
