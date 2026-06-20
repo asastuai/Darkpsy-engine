@@ -27,4 +27,8 @@ samples/**/*.mp3
 samples/**/*.flac
 samples/**/*.aif
 samples/**/*.aiff
+samples/**/*.webm
+samples/**/*.m4a
+samples/**/*.ogg
+samples/**/*.opus
 samples/placement.json
