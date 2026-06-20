@@ -27,7 +27,7 @@ WHISTLE = os.path.join(DESKTOP, "twisted_nerve.wav")
 OUT = os.path.join(DESKTOP, "ULTIMOREAPER_cine.RPP")
 SR = 44100
 T_DROP = float(sys.argv[1]) if len(sys.argv) > 1 else 21.0
-MUTE = {"FM", "LEAD"}     # la base perfecta de Juan: fm + lead muteados
+MUTE = set()              # no muteamos nada: la base TAL CUAL está
 
 
 def first_kick_offset():
