@@ -22,3 +22,9 @@ reaper_agent/Backups/
 *.tsbuildinfo
 forja/als_private/
 forja/reference_audio/
+samples/**/*.wav
+samples/**/*.mp3
+samples/**/*.flac
+samples/**/*.aif
+samples/**/*.aiff
+samples/placement.json
