@@ -32,3 +32,7 @@ samples/**/*.m4a
 samples/**/*.ogg
 samples/**/*.opus
 samples/placement.json
+
+# curso privado KDD - NUNCA commitear nada de esto
+samples/kdd_course/
+docs/kdd_course_*
