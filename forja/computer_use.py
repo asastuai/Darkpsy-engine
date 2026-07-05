@@ -79,10 +79,47 @@ def scroll(amount):
     user32.mouse_event(_WHEEL, 0, 0, int(amount) * 120, 0)
 
 
+def dragrel(x, y, dx, dy, steps=32):
+    """Drag con movimiento RELATIVO (mouse_event MOVE): genera raw input, que
+    es lo que leen los knobs/values de Bitwig (SetCursorPos no les llega)."""
+    move(x, y)
+    time.sleep(0.05)
+    user32.mouse_event(_LD, 0, 0, 0, 0)
+    time.sleep(0.05)
+    sx, sy = dx / steps, dy / steps
+    ax = ay = 0.0
+    for _ in range(steps):
+        ax += sx; ay += sy
+        ix, iy = int(round(ax)), int(round(ay))
+        if ix or iy:
+            user32.mouse_event(0x0001, ix, iy, 0, 0)  # MOUSEEVENTF_MOVE relativo
+            ax -= ix; ay -= iy
+        time.sleep(0.01)
+    time.sleep(0.05)
+    user32.mouse_event(_LU, 0, 0, 0, 0)
+
+
 # ---- teclado ----
 _VK = {"enter": 0x0D, "return": 0x0D, "esc": 0x1B, "escape": 0x1B, "tab": 0x09,
        "up": 0x26, "down": 0x28, "left": 0x25, "right": 0x27, "backspace": 0x08,
-       "delete": 0x2E, "home": 0x24, "end": 0x23, "space": 0x20}
+       "delete": 0x2E, "home": 0x24, "end": 0x23, "space": 0x20,
+       "ctrl": 0x11, "shift": 0x10, "alt": 0x12, "win": 0x5B,
+       "f1": 0x70, "f2": 0x71, "f3": 0x72, "f4": 0x73,
+       "minus": 0xBD, "period": 0xBE, "comma": 0xBC, "plus": 0xBB}
+# letras/números: VK = ord de la mayúscula
+for _c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789":
+    _VK[_c.lower()] = ord(_c)
+
+
+def combo(*names):
+    """Acorde de teclas: combo('ctrl','t') → Ctrl+T. Presiona en orden, suelta al revés."""
+    vks = [_VK[n.lower()] for n in names]
+    for vk in vks:
+        user32.keybd_event(vk, 0, 0, 0)
+        time.sleep(0.02)
+    for vk in reversed(vks):
+        user32.keybd_event(vk, 0, 2, 0)
+        time.sleep(0.02)
 
 
 def key(name):
@@ -141,6 +178,26 @@ def setknob(x, y, value):
     key("enter")
 
 
+def ctrltype(x, y, text):
+    """Bitwig: CTRL+CLICK sobre un valor abre el modo 'Type value'; se tipea
+    con VK (letra por letra, unicode NO le llega a Bitwig) y Enter."""
+    user32.keybd_event(0x11, 0, 0, 0)
+    time.sleep(0.08)
+    click(x, y)
+    time.sleep(0.08)
+    user32.keybd_event(0x11, 0, 2, 0)
+    time.sleep(0.4)
+    keymap = {".": "period", ",": "comma", "-": "minus", "+": "plus", ":": None}
+    for ch in str(text):
+        name = keymap.get(ch, ch)
+        if name is None:
+            continue
+        key(name)
+        time.sleep(0.05)
+    time.sleep(0.1)
+    key("enter")
+
+
 def shot(out="C:\\Users\\Juan\\Desktop\\_cu_shot.png", region=None):
     from PIL import ImageGrab
     img = ImageGrab.grab(bbox=region)  # region=(x,y,x2,y2) o None=todo
@@ -174,12 +231,18 @@ if __name__ == "__main__":
         dblclick(int(a[1]), int(a[2])); print("dblclick en", a[1], a[2])
     elif cmd == "drag":
         drag(int(a[1]), int(a[2]), int(a[3]), int(a[4])); print("drag", a[1:5])
+    elif cmd == "dragrel":
+        dragrel(int(a[1]), int(a[2]), int(a[3]), int(a[4])); print("dragrel", a[1:5])
     elif cmd == "scroll":
         scroll(int(a[1])); print("scroll", a[1])
     elif cmd == "type":
         type_text(a[1]); print("typed:", a[1])
     elif cmd == "key":
         key(a[1]); print("key:", a[1])
+    elif cmd == "combo":
+        combo(*a[1:]); print("combo:", "+".join(a[1:]))
+    elif cmd == "ctrltype":
+        ctrltype(int(a[1]), int(a[2]), a[3]); print(f"ctrltype ({a[1]},{a[2]}) = {a[3]}")
     elif cmd == "setknob":
         setknob(int(a[1]), int(a[2]), a[3]); print(f"setknob ({a[1]},{a[2]}) = {a[3]}")
     else:
