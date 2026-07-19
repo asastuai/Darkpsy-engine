@@ -134,6 +134,6 @@ Y esa intención, por ahora, solo puede venir de un humano.
 
 ---
 
-*Proyecto: [github.com/asastuai/Darkpsy-engine](https://github.com/asastuai/Darkpsy-engine)*
+*Proyecto: [github.com/Jc-asastu/Darkpsy-engine](https://github.com/Jc-asastu/Darkpsy-engine)*
 
 *"El silencio antes del drop es la parte más fuerte del track"*

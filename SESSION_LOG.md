@@ -117,7 +117,7 @@ Con eso se arma el track final con la mejor combinacion de presets profesionales
 - Python: mido, numpy, scipy, pedalboard (Spotify), python-osc, sounddevice
 
 ## Repo
-**github.com/asastuai/Darkpsy-engine** — publico
+**github.com/Jc-asastu/Darkpsy-engine** — publico
 
 ## Frase del proyecto
 *"El silencio antes del drop es la parte mas fuerte del track"*

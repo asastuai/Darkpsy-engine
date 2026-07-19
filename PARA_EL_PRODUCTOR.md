@@ -93,6 +93,6 @@ Calibrado contra **Glosolalia** (Dark Prisma Records). Artistas de referencia:
 ## Creditos
 
 - Composicion y estructura: IA (Claude, Anthropic)
-- Direccion creativa: Juan (@asastuai)
+- Direccion creativa: Juan (@Jc-asastu)
 - Sound design y mezcla: [TU NOMBRE]
-- Repo: github.com/asastuai/Darkpsy-engine
+- Repo: github.com/Jc-asastu/Darkpsy-engine
